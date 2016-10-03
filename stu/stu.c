@@ -1,19 +1,21 @@
 #include"stdio.h"
 #include"stdlib.h"
 #include"malloc.h"
-//#include"string.h"
+#include"string.h"
 
 
 #define LEN sizeof(struct student)			//宏定义 LEN = sizeof(struct student)
 
-struct student *creat();					//声明创建链表的函数
-void print(struct student *head);			//声明输出链表的函数
-struct student *loadinfo();					//加载文件内容到链表
-void savequit(struct student *head);		//将链表内容写入文件
-void menu();								//声明界面函数
-int n=1;									//从第一个学生开始,学生人数统计,控制循环输出
+struct student *creat();								//声明创建链表的函数
+void print(struct student *head);						//声明输出链表的函数
+struct student *loadinfo();								//加载文件内容到链表
+void savequit(struct student *head);					//将链表内容写入文件
+struct student *delname(struct student *head);			//通过姓名删除学生信息
+struct student *delid(struct student *head);			//通过学号删除学生信息
+void menu();											//声明界面函数
+int n=1;												//从第一个学生开始,学生人数统计,控制循环输出
 
-struct student								//定义学生信息这一结构体
+struct student											//定义学生信息这一结构体
 {
 	char id[20];							//学生学号
 	char name[20];							//学生姓名
@@ -25,7 +27,7 @@ struct student								//定义学生信息这一结构体
 
 void main()
 {
-	int number;				//定义对应的功能选择项
+	int number,delnum,a;				//定义对应的功能选择项
 	FILE *fp;
 	struct student *stu,*head;	//定义*stu,用来指向创建的链表
 	stu = NULL;
@@ -34,19 +36,27 @@ void main()
 	{
 		if((fp = fopen("data.txt","r"))==NULL)
 		{
-			//	if(stu == NULL)//判断数据库是否存有数据
-			//	{
-			char cls = 'y';
 			printf("┏┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┓\n");
 			printf("┣ 数据库没有任何学生信息,请初始化数据库┫\n");
 			printf("┗┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┛\n");
 			stu = creat();
 			savequit(stu);
 			free(stu);
-			printf("录入完毕,按y清屏,输入任意键进入主界面: ");
-			scanf("%s",&cls);
-			if(cls=='y' || cls=='Y')
+			printf("┏┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┓\n");
+			printf("┣       学 生 信 息 录 入 成 功 !      ┫\n");
+			printf("┣          1.清屏进入系统              ┫\n");
+			printf("┣          2.保留屏幕进入系统          ┫\n");
+			printf("┗┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┛\n");
+			printf("请输入1-2进行你的操作: ");
+			scanf("%d",&a);
+			switch(a)
+			{
+			case 1:
 				system("cls");//清屏
+				break;
+			case 2:
+				break;
+			}		
 		}
 		else
 		{
@@ -59,7 +69,27 @@ void main()
 				printf("正在开发!\n");
 				break;
 			case 2:				//删除学生信息
-				printf("正在开发!\n");
+				printf("\n");
+				printf("┏┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┓\n");
+				printf("┣       1.通过学号删除学生信息         ┫\n");
+				printf("┣       2.通过姓名删除学生信息         ┫\n");
+				printf("┣       3.返                回         ┫\n");
+				printf("┗┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┛\n\n");
+				printf("请输入1-3进行你的操作: ");
+				scanf("%d",&delnum);
+				switch(delnum)
+					{
+				case 1:
+					delid(head);
+					savequit(head);
+					break;
+				case 2:
+					delname(head);
+					savequit(head);
+					break;
+				case 3:
+					break;
+				}
 				break;
 			case 3:
 				printf("正在开发!\n");
@@ -90,13 +120,15 @@ void menu()
 	printf("  ▁▂▃▄▅ 1.增加学生信息 ▅▄▃▂▁\n");
 	printf("  ▁▂▃▄▅ 2.删除学生信息 ▅▄▃▂▁\n");
 	printf("  ▁▂▃▄▅ 3.修改学生信息 ▅▄▃▂▁\n");
-	printf("  ▁▂▃▄▅ 4.输出学生信息 ▅▄▃▂▁\n");
+	printf("  ▁▂▃▄▅ 4.查看学生信息 ▅▄▃▂▁\n");
 	printf("  ▁▂▃▄▅ 5.保存学生信息 ▅▄▃▂▁\n");
 	printf("  ▁▂▃▄▅ 6.退出         ▅▄▃▂▁\n\n");
 	printf("■□■□■□■□■□■□■□■□■□■□■\n\n");
 	
 	printf("请输入1-6进行你的操作: ");
 }
+
+
 
 struct student *creat()
 {
@@ -163,36 +195,87 @@ struct student *creat()
 		
 	}
 	p2->next = NULL;			//单向链表的最后一个节点要指向NULL
+	free(p1);
+	p1=NULL;
 	return head;
 }
 
-void print(struct student *head)//链表输出函数
+
+
+
+void print(struct student *head)//输出链表
 {	
-	char cls='y';
+	int a;
 	struct student *p;
-	printf("\n◆◆◆目前数据库里共有%d名学生的信息◆◆◆\n",n-1);
+
 	p=head;
 	if(head!=NULL)				//只要不是空链表就输出链表中的值
 	{
 		
-		printf("学号\t姓名\t性别\t年龄\n");
+		printf("\n学号\t姓名\t性别\t年龄\n");
 		while(p!=NULL)
 		{
-			
 			printf("%s\t%s\t%s\t%d\n",p->id,p->name,p->sex,p->age);
 			p=p->next;			//转移到下一个节点继续输出,直到p=NULL为止
+			
 		}
 	}
 	printf("\n\n");
-	if(cls=='y' || cls=='Y')
-	{
-		printf("输出完毕,按y清屏,输入任意键返回主界面: ");
-		scanf("%s",&cls);
-		if(cls=='y' || cls=='Y')
-			system("cls");
-	}
+	printf("┏┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┓\n");
+	printf("┣       学 生 信 息 输 出 成 功 !      ┫\n");
+	printf("┣          1.清屏返回                  ┫\n");
+	printf("┣          2.不清屏返回                ┫\n");
+	printf("┗┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┛\n");
+	printf("请输入1-2进行你的操作: ");
+	scanf("%d",&a);
+			switch(a)
+			{
+			case 1:
+				system("cls");//清屏
+				break;
+			case 2:
+				break;
+			}		
 	printf("\n");
 }
+
+
+
+
+struct student *loadinfo()//文本文件输出到链表中
+{	
+	char filename[] = "data.txt";
+	FILE *fp;
+	struct student *head,*p1;
+	int ishead = 1;
+	
+	head = (struct student *)malloc(LEN);
+	p1 = head;
+	p1->next = NULL;
+	
+	if(NULL == (fp = fopen(filename,"r")))
+	{
+		printf("发生错误!\n");
+		exit(0);
+	}
+	while(!feof(fp))
+	{
+		if(!ishead)
+		{
+		p1->next = (struct student *)malloc(LEN);
+		p1 = p1->next;
+		p1->next = NULL;
+		}
+		fscanf(fp,"%s %s %s %d\n",&p1->id,&p1->name,&p1->sex,&p1->age);	
+		if(ishead)
+			ishead = 0;
+	}
+	fclose(fp);
+	return head;
+}
+
+
+
 
 void savequit(struct student *head)//链表数据保存到文本文件
 {
@@ -210,35 +293,75 @@ void savequit(struct student *head)//链表数据保存到文本文件
 	while(p1 != NULL)
 	{
 		
-		fprintf(fp,"%s\t%s\t%s\t%d\r",p1->id,p1->name,p1->sex,p1->age);
+		fprintf(fp,"%s %s %s %d\n",p1->id,p1->name,p1->sex,p1->age);
 		p1 = p1->next;
 	}
 	fclose(fp);
 }
 
-struct student *loadinfo()//文本文件输出到链表中
-{	
-	char filename[] = "data.txt";
-	FILE *fp;
-	struct student *head,*p1;
+
+
+struct student *delname(struct student *head)//通过姓名删除学生信息
+{
+	char name[20];
+	struct student *p1,*p2;
 	
-	head = (struct student *)malloc(LEN);
+	if(head == NULL)
+	{
+		printf("链表为空\n");
+		return head;
+	}
 	p1 = head;
-	p1 -> next = NULL;
-	
-	if(NULL == (fp = fopen(filename,"r")))
+	printf("告诉我你要删除的学生的名字: ");
+	scanf("%s",&name);
+	while((strcmp(p1->name,name) != 0) && (p1->next != NULL))
 	{
-		printf("发生错误!");
-		exit(0);
-	}
-	while(!feof(fp))
-	{
-		fscanf(fp,"%s%s%s%d",&p1->id,&p1->name,&p1->sex,&p1->age);
-		
-		p1->next = (struct student *)malloc(LEN);
+		p2 = p1;
 		p1 = p1->next;
-		p1->next = NULL;
 	}
-	fclose(fp);
+	if(strcmp(p1->name,name) == 0)
+	{
+		if(p1 == head)
+		{
+			head = p1->next;
+		}
+		else
+		{
+			p2->next = p1->next;
+		}
+		free(p1);
+		p1 = NULL;
+		
+		n-=1;
+	}
+	else
+	{
+		printf("\n抱歉,学生信息没有找到!");
+	}
+	return head;
+}
+
+struct student *delid(struct student *head)//通过学号删除学生信息
+{
+	struct student *p=head,*pr=head;
+	int i,j;
+	printf("\n告诉我你要删除的学生的学号: ");
+	scanf("%d",&i);
+	
+	for(j=1;j<i;j++)
+	{
+		pr = p;
+		p = p->next;
+	}
+	if(p == head)
+	{
+		head = p->next;
+	}
+	else
+	{
+		pr->next = p->next;
+		printf("删除学生信息成功!\n");
+	}
+	free(p);
 	return head;
 }
