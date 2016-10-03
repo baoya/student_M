@@ -12,6 +12,7 @@ struct student *loadinfo();								//加载文件内容到链表
 void savequit(struct student *head);					//将链表内容写入文件
 struct student *delname(struct student *head);			//通过姓名删除学生信息
 struct student *delid(struct student *head);			//通过学号删除学生信息
+struct student *bubblesort(struct student *head);		//冒泡排序
 void menu();											//声明系统界面函数
 int delmenu();											//声明删除界面和操作删除函数
 int n=1;												//从第一个学生开始,学生人数统计,控制循环输出
@@ -41,6 +42,7 @@ void main()
 			printf("┣ 数据库没有任何学生信息,请初始化数据库┫\n");
 			printf("┗┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┛\n");
 			stu = creat();
+			stu = bubblesort(stu);
 			savequit(stu);
 			free(stu);
 			printf("┏┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┓\n");
@@ -388,5 +390,39 @@ struct student *delid(struct student *head)//通过学号删除学生信息
 	{
 		printf("\n抱歉,学生信息没有找到!");
 	}
+	return head;
+}
+
+struct student *bubblesort(struct student *head)
+{
+	struct student *endpt;		//控制循环比较
+	struct student *p;			//临时指针变量
+	struct student *p1,*p2;
+
+	p1 = (struct student *)malloc(LEN);
+	p1->next = head;
+	//增加一个节点,放在第一个节点的前面,主要是为了便于比较,因为第一个节点没有前驱节点,我们不能交换地址
+	head = p1;
+	//让head指向p1节点,排序完成后我们再把p1节点释放掉
+	for(endpt = NULL;endpt != head;endpt = p)
+	{
+		for(p=p1=head;p1->next->next!=endpt;p1=p1->next)
+		{
+			if(strcmp(p1->next->id,p1->next->next->id) == 1)
+				//如果前面的键值的ASCll比后面的键值的ASCLL大
+			{
+				p2 = p1->next->next;
+				p1->next->next = p2->next;
+
+				p2->next = p1->next;
+				p1->next = p2;
+				p = p1->next->next;
+			}
+		}
+	}
+	p1 = head;
+	head = head->next;
+	free(p1);
+	p1 = NULL;
 	return head;
 }
