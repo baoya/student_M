@@ -13,6 +13,8 @@ void savequit(struct student *head);					//将链表内容写入文件
 struct student *delname(struct student *head);			//通过姓名删除学生信息
 struct student *delid(struct student *head);			//通过学号删除学生信息
 struct student *bubblesort(struct student *head);		//冒泡排序
+void creat_pwd();										//创建启动密码
+void remove_pwd();										//修改启动密码
 void menu();											//声明系统界面函数
 int delmenu();											//声明删除界面和操作删除函数
 int n=1;												//从第一个学生开始,学生人数统计,控制循环输出
@@ -34,8 +36,11 @@ void main()
 	struct student *stu,*head;	//定义*stu,用来指向创建的链表
 	stu = NULL;
 	head =NULL;
+	
+	creat_pwd();
 	while(1)
 	{
+		
 		if((fp = fopen("data.txt","r"))==NULL)
 		{
 			printf("┏┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┓\n");
@@ -73,36 +78,35 @@ void main()
 				break;
 			case 2:				//删除学生信息
 				delnum = delmenu();
-					switch(delnum)
-					{
-					case 1:
-						delid(head);
-						savequit(head);
-						break;
-					case 2:
-						delname(head);
-						savequit(head);
-						break;
-					case 3:
-						break;
-					}
+				switch(delnum)
+				{
+				case 1:
+					delid(head);
+					savequit(head);
+					break;
+				case 2:
+					delname(head);
+					savequit(head);
+					break;
+				case 3:
+					break;
+				}
 				break;
-			case 3:
-				printf("正在开发!\n");
-				break;
-			case 4:				//输出所有学生信息
-				print(head);
-				break;
-			case 5:				//保存
-				savequit(head);
-				free(head);
-				break;
-			case 6:				//退出
-				exit(0);
-				break;
-			default:
-				printf("正在开发!\n");
-				break;
+				case 3:
+					printf("正在开发!\n");
+					break;
+				case 4:				//输出所有学生信息
+					print(head);
+					break;
+				case 5:				//保存
+					remove_pwd();
+					break;
+				case 6:				//退出
+					exit(0);
+					break;
+				default:
+					printf("正在开发!\n");
+					break;
 					
 					
 			}
@@ -117,7 +121,7 @@ void menu()
 	printf("  ▁▂▃▄▅ 2.删除学生信息 ▅▄▃▂▁\n");
 	printf("  ▁▂▃▄▅ 3.修改学生信息 ▅▄▃▂▁\n");
 	printf("  ▁▂▃▄▅ 4.查看学生信息 ▅▄▃▂▁\n");
-	printf("  ▁▂▃▄▅ 5.保存学生信息 ▅▄▃▂▁\n");
+	printf("  ▁▂▃▄▅ 5.修改启动密码 ▅▄▃▂▁\n");
 	printf("  ▁▂▃▄▅ 6.退出         ▅▄▃▂▁\n\n");
 	printf("■□■□■□■□■□■□■□■□■□■□■\n\n");
 	
@@ -137,6 +141,110 @@ int delmenu()
 	scanf("%d",&delnum);
 	return delnum;
 }
+
+void creat_pwd()//创建密码操作
+{
+	FILE *fp;
+	char pwd[20];//启动密码
+	char pwd_1[20];//设置第一次密码
+	char pwd_2[20];//设置第二次密码
+	char userspwd[20] = "userspwd.txt";//文件名
+	
+	while(1)
+	{	
+		if((fp = fopen(userspwd,"r")) != NULL)//如果此文件存在，只写,打开文件,将文件中的字符存入pwd;
+		{
+			fscanf(fp,"%s",&pwd);
+			printf("请输入启动密码: ");
+			scanf("%s",&pwd_1);
+			if(strcmp(pwd,pwd_1) == 0)
+			{
+				printf("\n密码正确!\n");
+				break;
+			}
+			else
+			{
+				printf("\n密码错误!请重新输入!\n\n");
+			}
+			fclose(fp);
+		}
+		else							//如果不存在,读写,创建
+		{
+			while(1)
+			{
+				printf("请设置启动密码: ");
+				scanf("%s",&pwd_1);
+				printf("\n请再次输入启动密码: ");
+				scanf("%s",&pwd_2);
+				if(strcmp(pwd_1,pwd_2) == 0)
+				{
+					fp = fopen(userspwd,"w");
+					fprintf(fp,"%s",pwd_1);
+					printf("\n密码设置成功!\n");
+					fclose(fp);
+					break;
+				}
+				else
+				{
+					printf("\n两次密码不一样!请重新输入!\n\n");
+				}
+			}		
+		}
+	}
+}
+
+
+void remove_pwd()//修改密码操作
+{
+	FILE *fp;
+	char pwd[20];			//读入启动密码
+	char pwd_pwd[20];		//验证启动密码
+	char pwd_1[20];			//设置第一次密码
+	char pwd_2[20];			//设置第二次密码
+	char userspwd[20] = "userspwd.txt";
+	while(1)
+	{
+		if((fp = fopen(userspwd,"r")) != NULL)//如果此文件存在，只写,打开文件,将文件中的字符存入pwd;
+		{
+			fscanf(fp,"%s",&pwd);
+			printf("请验证启动密码: ");
+			scanf("%s",&pwd_pwd);
+			if(strcmp(pwd,pwd_pwd) == 0)
+			{
+				printf("\n密码正确!\n");
+				if((fp = fopen(userspwd,"w")) != NULL)
+				{
+					while(1)
+					{
+						printf("请设置启动密码: ");
+						scanf("%s",&pwd_1);
+						printf("\n请再次输入启动密码: ");
+						scanf("%s",&pwd_2);
+						if(strcmp(pwd_1,pwd_2) == 0)
+						{
+							fp = fopen(userspwd,"w");
+							fprintf(fp,"%s",pwd_1);
+							printf("\n密码设置成功!\n");
+							fclose(fp);
+							break;
+						}
+						else
+						{
+							printf("\n两次密码不一样!请重新输入!\n\n");
+						}
+					}
+				}
+				break;
+			}
+			else
+			{
+				printf("\n密码错误!请重新输入!\n\n");
+			}
+			fclose(fp);
+		}
+	}
+}
+
 
 
 struct student *creat()
@@ -398,7 +506,7 @@ struct student *bubblesort(struct student *head)
 	struct student *endpt;		//控制循环比较
 	struct student *p;			//临时指针变量
 	struct student *p1,*p2;
-
+	
 	p1 = (struct student *)malloc(LEN);
 	p1->next = head;
 	//增加一个节点,放在第一个节点的前面,主要是为了便于比较,因为第一个节点没有前驱节点,我们不能交换地址
@@ -413,7 +521,7 @@ struct student *bubblesort(struct student *head)
 			{
 				p2 = p1->next->next;
 				p1->next->next = p2->next;
-
+				
 				p2->next = p1->next;
 				p1->next = p2;
 				p = p1->next->next;
