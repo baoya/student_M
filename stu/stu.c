@@ -6,20 +6,25 @@
 
 #define LEN sizeof(struct student)			//宏定义 LEN = sizeof(struct student)
 
-struct student *creat();								//声明创建链表的函数
-void print(struct student *head);						//声明输出链表的函数
-struct student *loadinfo();								//加载文件内容到链表
-void savequit(struct student *head);					//将链表内容写入文件
-struct student *delname(struct student *head);			//通过姓名删除学生信息
-struct student *delid(struct student *head);			//通过学号删除学生信息
-struct student *bubblesort(struct student *head);		//冒泡排序
-void creat_pwd();										//创建启动密码
-void remove_pwd();										//修改启动密码
-void menu();											//声明系统界面函数
-int delmenu();											//声明删除界面和操作删除函数
-int n=1;												//从第一个学生开始,学生人数统计,控制循环输出
+struct student *creat();												//声明创建链表的函数
+void print(struct student *head);										//声明输出链表的函数
+struct student *loadinfo();												//加载文件内容到链表
+void savequit(struct student *head);									//将链表内容写入文件
+struct student *delname(struct student *head);							//通过姓名删除学生信息
+struct student *delid(struct student *head);							//通过学号删除学生信息
+struct student *bubblesort(struct student *head);						//冒泡排序
+void creat_pwd();														//创建启动密码
+void remove_pwd();														//修改启动密码
+struct student *insert(struct student *head,struct student *p);			//插入信息
 
-struct student											//定义学生信息这一结构体
+struct student *stu_id(struct student *head);							//学号搜索
+struct student *stu_name(struct student *head);							//姓名搜索
+void menu();															//声明系统界面函数
+int delmenu();															//声明删除界面和操作删除函数
+int see();																//查看学生信息函数界面
+int n=1;																//从第一个学生开始,学生人数统计,控制循环输出
+
+struct student								//定义学生信息这一结构体
 {
 	char id[20];							//学生学号
 	char name[20];							//学生姓名
@@ -31,9 +36,9 @@ struct student											//定义学生信息这一结构体
 
 void main()
 {
-	int number,delnum,a;				//定义对应的功能选择项
+	int number,delnum,see_id,a;				//定义对应的功能选择项
 	FILE *fp;
-	struct student *stu,*head;	//定义*stu,用来指向创建的链表
+	struct student *stu,*head,*p1;	//定义*stu,用来指向创建的链表
 	stu = NULL;
 	head =NULL;
 	
@@ -74,7 +79,24 @@ void main()
 			switch(number)
 			{
 			case 1:				//增加学生信息
-				printf("正在开发!\n");
+				
+				p1 = (struct student *)malloc(LEN);
+
+				printf("请输入插入学生的信息: ");
+				printf("\n\n");
+				printf("输入学号: ");
+				scanf("%s",&p1->id);
+				printf("输入姓名: ");
+				scanf("%s",&p1->name);
+				printf("输入性别: ");
+				scanf("%s",&p1->sex);
+				printf("输入年龄: ");
+				scanf("%d",&p1->age);
+				printf("\n");
+
+				head = insert(head,p1);
+				savequit(head);
+				free(p1);
 				break;
 			case 2:				//删除学生信息
 				delnum = delmenu();
@@ -92,13 +114,28 @@ void main()
 					break;
 				}
 				break;
+				case 3:					//修改学生信息
+				
+
+					break;
+				case 4:				//输出学生信息
+					see_id = see();
+					switch(see_id)
+				{
+				case 1:
+					stu_id(head);//学号查询
+					break;
+				case 2:
+					stu_name(head);
+					break;
 				case 3:
-					printf("正在开发!\n");
+					print(head);//查询全部
 					break;
-				case 4:				//输出所有学生信息
-					print(head);
+				default:
 					break;
-				case 5:				//保存
+				}	
+					break;
+				case 5:				//修改启动密码
 					remove_pwd();
 					break;
 				case 6:				//退出
@@ -142,6 +179,22 @@ int delmenu()
 	return delnum;
 }
 
+int see()
+{
+	int see;
+	printf("\n");
+	printf("┏┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┳┓\n");
+	printf("┣       1.通过学号查看学生信息         ┫\n");
+	printf("┣       2.通过姓名查看学生信息         ┫\n");
+	printf("┣       3.查看所有学生信息             ┫\n");
+	printf("┣       4.返                回         ┫\n");
+	printf("┗┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┻┛\n\n");
+	printf("请输入1-4进行你的操作: ");
+	scanf("%d",&see);
+	return see;
+
+}
+
 void creat_pwd()//创建密码操作
 {
 	FILE *fp;
@@ -157,14 +210,17 @@ void creat_pwd()//创建密码操作
 			fscanf(fp,"%s",&pwd);
 			printf("请输入启动密码: ");
 			scanf("%s",&pwd_1);
+			system("cls");
 			if(strcmp(pwd,pwd_1) == 0)
 			{
-				printf("\n密码正确!\n");
+				printf("密码正确!");
+				system("cls");
 				break;
 			}
 			else
 			{
-				printf("\n密码错误!请重新输入!\n\n");
+				printf("密码错误!请重新输入!");
+				system("cls");
 			}
 			fclose(fp);
 		}
@@ -174,19 +230,23 @@ void creat_pwd()//创建密码操作
 			{
 				printf("请设置启动密码: ");
 				scanf("%s",&pwd_1);
-				printf("\n请再次输入启动密码: ");
+				system("cls");
+				printf("请再次输入启动密码: ");
 				scanf("%s",&pwd_2);
+				system("cls");
 				if(strcmp(pwd_1,pwd_2) == 0)
 				{
 					fp = fopen(userspwd,"w");
 					fprintf(fp,"%s",pwd_1);
-					printf("\n密码设置成功!\n");
+					printf("密码设置成功!");
+					system("cls");
 					fclose(fp);
 					break;
 				}
 				else
 				{
-					printf("\n两次密码不一样!请重新输入!\n\n");
+					printf("两次密码不一样!请重新输入!");
+					system("cls");
 				}
 			}		
 		}
@@ -209,28 +269,34 @@ void remove_pwd()//修改密码操作
 			fscanf(fp,"%s",&pwd);
 			printf("请验证启动密码: ");
 			scanf("%s",&pwd_pwd);
+			system("cls");
 			if(strcmp(pwd,pwd_pwd) == 0)
 			{
-				printf("\n密码正确!\n");
+				printf("密码正确!");
+				system("cls");
 				if((fp = fopen(userspwd,"w")) != NULL)
 				{
 					while(1)
 					{
 						printf("请设置启动密码: ");
 						scanf("%s",&pwd_1);
-						printf("\n请再次输入启动密码: ");
+						system("cls");
+						printf("请再次输入启动密码: ");
 						scanf("%s",&pwd_2);
+						system("cls");
 						if(strcmp(pwd_1,pwd_2) == 0)
 						{
 							fp = fopen(userspwd,"w");
 							fprintf(fp,"%s",pwd_1);
-							printf("\n密码设置成功!\n");
+							printf("密码设置成功!");
+							system("cls");
 							fclose(fp);
 							break;
 						}
 						else
 						{
-							printf("\n两次密码不一样!请重新输入!\n\n");
+							printf("两次密码不一样!请重新输入!");
+							system("cls");
 						}
 					}
 				}
@@ -239,6 +305,7 @@ void remove_pwd()//修改密码操作
 			else
 			{
 				printf("\n密码错误!请重新输入!\n\n");
+				system("cls");
 			}
 			fclose(fp);
 		}
@@ -247,7 +314,7 @@ void remove_pwd()//修改密码操作
 
 
 
-struct student *creat()
+struct student *creat() //创建链表
 {
 	int len;								//控制录入学生信息的人数
 	struct student *head;					//头节点
@@ -429,7 +496,6 @@ struct student *delname(struct student *head)//通过姓名删除学生信息
 		return head;
 	}
 	p1 = head;
-	printf("很高兴为您服务!\n");
 	printf("告诉我需要删除的学生的名字: ");
 	scanf("%s",&name);
 	while((strcmp(p1->name,name) != 0) && (p1->next != NULL))
@@ -470,7 +536,6 @@ struct student *delid(struct student *head)//通过学号删除学生信息
 		return head;
 	}
 	p1 = head;
-	printf("很高兴为您服务!\n");
 	printf("告诉我需要删除的学生的学号: ");
 	scanf("%s",&id);
 	while((strcmp(p1->id,id) != 0) && (p1->next != NULL))
@@ -501,7 +566,7 @@ struct student *delid(struct student *head)//通过学号删除学生信息
 	return head;
 }
 
-struct student *bubblesort(struct student *head)
+struct student *bubblesort(struct student *head) //学号冒泡排序
 {
 	struct student *endpt;		//控制循环比较
 	struct student *p;			//临时指针变量
@@ -534,3 +599,103 @@ struct student *bubblesort(struct student *head)
 	p1 = NULL;
 	return head;
 }
+
+struct student *insert(struct student *head,struct student *p)     //插入数据
+{
+
+  struct student *p1,*p2;
+  p1=head;
+  p2=p1->next;
+  while((strcmp(p->id,p2->id) > 0)&&(p2!=NULL))
+  {
+   p1=p2;
+   p2=p2->next;
+  }
+  if(strcmp(p->id,p2->id) == 0)
+  {
+	printf("输入错误!(学号不能重复!)");
+	printf("请重新操作!");
+  }
+  else if(p2!=NULL)
+  {
+	  p1->next=p;
+      p->next=p2;
+	  printf("添加完毕!");
+  }
+  else if(p2==NULL)
+  {
+	  p1->next=p;
+	  p->next=NULL;
+	  printf("添加完毕!");
+  }
+	return head;
+}
+
+
+struct student *stu_id(struct student *head)//通过学号搜索学生信息
+{
+	char id[20];
+	struct student *p1,*p2;
+	
+	if(head == NULL)
+	{
+		printf("链表为空\n");
+		return head;
+	}
+	p1 = head;
+	printf("告诉我你要查看的学生的学号: ");
+	scanf("%s",&id);
+	while((strcmp(p1->id,id) != 0) && (p1->next != NULL))
+	{
+		p2 = p1;
+		p1 = p1->next;
+	}
+	if(strcmp(p1->id,id) == 0)
+	{
+	printf("\n学号\t姓名\t性别\t年龄\n");
+	printf("%s\t%s\t%s\t%d\n",p1->id,p1->name,p1->sex,p1->age);
+	free(p1);
+	p1 = NULL;
+	}
+	else
+	{
+		printf("\n抱歉,学生信息没有找到!");
+	}
+	return head;
+}
+
+
+struct student *stu_name(struct student *head)//通过姓名搜索学生信息
+{
+	char name[20];
+	struct student *p1,*p2;
+	
+	if(head == NULL)
+	{
+		printf("链表为空\n");
+		return head;
+	}
+	p1 = head;
+	printf("告诉我你要查看的学生的姓名: ");
+	scanf("%s",&name);
+	while((strcmp(p1->name,name) != 0) && (p1->next != NULL))
+	{
+		p2 = p1;
+		p1 = p1->next;
+	}
+	if(strcmp(p1->name,name) == 0)
+	{
+	printf("\n学号\t姓名\t性别\t年龄\n");
+	printf("%s\t%s\t%s\t%d\n",p1->id,p1->name,p1->sex,p1->age);
+	free(p1);
+	p1 = NULL;
+	}
+	else
+	{
+		printf("\n抱歉,学生信息没有找到!");
+	}
+	return head;
+}
+
+
+
