@@ -16,7 +16,8 @@ struct student *bubblesort(struct student *head);						//冒泡排序
 void creat_pwd();														//创建启动密码
 void remove_pwd();														//修改启动密码
 struct student *insert(struct student *head,struct student *p);			//插入信息
-
+struct student *amend_stu_1(struct student *head);
+struct student *amend_stu_2(struct student *head,struct student *p);
 struct student *stu_id(struct student *head);							//学号搜索
 struct student *stu_name(struct student *head);							//姓名搜索
 void menu();															//声明系统界面函数
@@ -38,7 +39,7 @@ void main()
 {
 	int number,delnum,see_id,a;				//定义对应的功能选择项
 	FILE *fp;
-	struct student *stu,*head,*p1;	//定义*stu,用来指向创建的链表
+	struct student *stu,*head,*p1,*p2;	//定义*stu,用来指向创建的链表
 	stu = NULL;
 	head =NULL;
 	
@@ -115,8 +116,24 @@ void main()
 				}
 				break;
 				case 3:					//修改学生信息
-				
+				head = amend_stu_1(head);
+				savequit(head);
+				p1 = (struct student *)malloc(LEN);
+				printf("请输入插入学生的信息: ");
+				printf("\n\n");
+				printf("输入学号: ");
+				scanf("%s",&p1->id);
+				printf("输入姓名: ");
+				scanf("%s",&p1->name);
+				printf("输入性别: ");
+				scanf("%s",&p1->sex);
+				printf("输入年龄: ");
+				scanf("%d",&p1->age);
+				printf("\n");
 
+					head = amend_stu_2(head,p1);
+					
+					savequit(head);
 					break;
 				case 4:				//输出学生信息
 					see_id = see();
@@ -697,5 +714,75 @@ struct student *stu_name(struct student *head)//通过姓名搜索学生信息
 	return head;
 }
 
+struct student *amend_stu_1(struct student *head)
+{
+	char id[20];
+	struct student *p1,*p2;
+	
+	if(head == NULL)
+	{
+		printf("链表为空\n");
+		return head;
+	}
+	p1 = head;
+	printf("告诉我需要修改的学生的学号: ");
+	scanf("%s",&id);
+	while((strcmp(p1->id,id) != 0) && (p1->next != NULL))
+	{
+		p2 = p1;
+		p1 = p1->next;
+	}
+	if(strcmp(p1->id,id) == 0)
+	{
+		if(p1 == head)
+		{
+			head = p1->next;
+		}
+		else
+		{
+			p2->next = p1->next;
+		}
+		free(p1);
+		p1 = NULL;
+		
+		n-=1;
+	}
+	else
+	{
+		printf("\n抱歉,学生信息没有找到!");
+	}
+	return head;
+}
 
+
+struct student *amend_stu_2(struct student *head,struct student *p)     //插入数据
+{
+
+  struct student *p1,*p2;
+  p1=head;
+  p2=p1->next;
+  while((strcmp(p->id,p2->id) > 0)&&(p2!=NULL))
+  {
+   p1=p2;
+   p2=p2->next;
+  }
+  if(strcmp(p->id,p2->id) == 0)
+  {
+	printf("输入错误!(学号不能重复!)");
+	printf("请重新操作!");
+  }
+  else if(p2!=NULL)
+  {
+	  p1->next=p;
+      p->next=p2;
+	  printf("修改完毕!");
+  }
+  else if(p2==NULL)
+  {
+	  p1->next=p;
+	  p->next=NULL;
+	  printf("修改完毕!");
+  }
+	return head;
+}
 
